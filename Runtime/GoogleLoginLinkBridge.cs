@@ -80,7 +80,16 @@ namespace GameFrameX.Login.Google.Runtime
         {
             _loginSuccess = loginSuccess;
             _loginFail = loginFail;
-            Debug.Log("GoogleLogin-SignIn");
+#if UNITY_EDITOR
+            var googleLoginSuccess = new GoogleLoginSuccess();
+            googleLoginSuccess.PlayerId = SystemInfo.deviceUniqueIdentifier;
+            googleLoginSuccess.IdToken = "test_login@google.com";
+            googleLoginSuccess.DisplayName = "Editor_Google_Test";
+            googleLoginSuccess.IdToken = SystemInfo.deviceUniqueIdentifier;
+            loginSuccess?.Invoke(googleLoginSuccess);
+            return;
+#endif
+
             UnityPlayerHelper.SignIn(_projectId);
         }
 
@@ -90,7 +99,6 @@ namespace GameFrameX.Login.Google.Runtime
         [UnityEngine.Scripting.Preserve]
         public void SignOut()
         {
-            Debug.Log("GoogleLogin-SignOut");
             UnityPlayerHelper.SignOut();
         }
 
