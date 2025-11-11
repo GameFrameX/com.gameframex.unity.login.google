@@ -14,7 +14,7 @@ namespace GameFrameX.Login.Google.Runtime
     /// Google登录组件。
     /// </summary>
     [DisallowMultipleComponent]
-    [AddComponentMenu("Game Framework/GoogleLogin")]
+    [AddComponentMenu("GameFrameX/GoogleLogin")]
     [UnityEngine.Scripting.Preserve]
     public class GoogleLoginComponent : GameFrameworkComponent
     {
