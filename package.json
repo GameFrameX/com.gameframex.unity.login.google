@@ -10,7 +10,7 @@
   ],
   "repository": {
     "name": "com.gameframex.unity.login.google",
-    "url": "https://github.com/gameframex/com.gameframex.unity.login.google.git",
+    "url": "git+https://github.com/gameframex/com.gameframex.unity.login.google.git",
     "type": "git"
   },
   "author": {
