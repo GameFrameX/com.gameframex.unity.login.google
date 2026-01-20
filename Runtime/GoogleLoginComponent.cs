@@ -43,8 +43,6 @@ namespace GameFrameX.Login.Google.Runtime
     [UnityEngine.Scripting.Preserve]
     public class GoogleLoginComponent : GameFrameworkComponent
     {
-        private const int DefaultPriority = 0;
-
         private IGoogleLoginManager _googleLoginManager = null;
 
         /// <summary>
@@ -64,9 +62,18 @@ namespace GameFrameX.Login.Google.Runtime
             _googleLoginManager = GameFrameworkEntry.GetModule<IGoogleLoginManager>();
             if (_googleLoginManager == null)
             {
-                Log.Fatal("Red system manager is invalid.");
+                Log.Fatal("Google Login Manager is invalid.");
                 return;
             }
+
+            var googleProjectId = BlankGetChannel.GetChannelName("googleProjectId");
+            if (string.IsNullOrEmpty(googleProjectId))
+            {
+                Log.Fatal("Google Login ProjectId is empty.");
+                return;
+            }
+
+            m_ProjectId = googleProjectId;
         }
 
         /// <summary>

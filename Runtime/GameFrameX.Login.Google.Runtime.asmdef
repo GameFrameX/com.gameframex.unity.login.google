@@ -1,16 +1,17 @@
 {
-  "name": "GameFrameX.Login.Google.Runtime",
-  "rootNamespace": "GameFrameX.Login.Google.Runtime",
-  "references": [
-    "GameFrameX.Runtime"
-  ],
-  "includePlatforms": [],
-  "excludePlatforms": [],
-  "allowUnsafeCode": false,
-  "overrideReferences": false,
-  "precompiledReferences": [],
-  "autoReferenced": true,
-  "defineConstraints": [],
-  "versionDefines": [],
-  "noEngineReferences": false
+    "name": "GameFrameX.Login.Google.Runtime",
+    "rootNamespace": "GameFrameX.Login.Google.Runtime",
+    "references": [
+        "GameFrameX.Runtime",
+        "BlankGetChannel.Runtime"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
