@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/gameframex/com.gameframex.unity.login.google/compare/1.0.0...1.0.1) (2026-01-20)
+
+
+### Bug Fixes
+
+* **Google登录:** 将登录失败回调参数从int改为string类型 ([4a2b3fa](https://github.com/gameframex/com.gameframex.unity.login.google/commit/4a2b3fa95d2e01e6854e71bdf735d6496e39148b))
+
 # 1.0.0 (2025-12-23)
 
 
