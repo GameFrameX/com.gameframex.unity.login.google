@@ -50,7 +50,7 @@ namespace GameFrameX.Login.Google.Runtime
         }
 
         [UnityEngine.Scripting.Preserve]
-        public void Login(Action<GoogleLoginSuccess> loginSuccess, Action<int> loginFail)
+        public void Login(Action<GoogleLoginSuccess> loginSuccess, Action<string> loginFail)
         {
             GoogleLoginLinkBridge.Instance.SignIn(loginSuccess, loginFail);
         }

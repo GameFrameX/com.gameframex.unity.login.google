@@ -76,7 +76,7 @@ namespace GameFrameX.Login.Google.Runtime
             else
             {
                 // fail
-                _loginFail?.Invoke(errorCode);
+                _loginFail?.Invoke(errorCode.ToString());
             }
         }
 
@@ -93,7 +93,7 @@ namespace GameFrameX.Login.Google.Runtime
         private string _projectId;
 
         private Action<GoogleLoginSuccess> _loginSuccess;
-        private Action<int> _loginFail;
+        private Action<string> _loginFail;
 
         /// <summary>
         /// 登录
@@ -101,7 +101,7 @@ namespace GameFrameX.Login.Google.Runtime
         /// <param name="loginSuccess">登录成功回调</param>
         /// <param name="loginFail">登录失败回调</param>
         [UnityEngine.Scripting.Preserve]
-        public void SignIn(Action<GoogleLoginSuccess> loginSuccess, Action<int> loginFail)
+        public void SignIn(Action<GoogleLoginSuccess> loginSuccess, Action<string> loginFail)
         {
             _loginSuccess = loginSuccess;
             _loginFail = loginFail;
