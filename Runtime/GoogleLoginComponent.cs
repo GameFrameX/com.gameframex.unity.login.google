@@ -69,35 +69,33 @@ namespace GameFrameX.Login.Google.Runtime
             }
         }
 
+        /// <summary>
+        /// 初始化 Google 登录模块。
+        /// </summary>
         [UnityEngine.Scripting.Preserve]
         public void Init()
         {
             _googleLoginManager.Init(m_ProjectId);
         }
 
+        /// <summary>
+        /// 执行 Google 登录。
+        /// </summary>
+        /// <param name="loginSuccess">登录成功回调，携带登录成功信息。</param>
+        /// <param name="loginFail">登录失败回调，携带错误信息。</param>
         [UnityEngine.Scripting.Preserve]
         public void Login(Action<GoogleLoginSuccess> loginSuccess, Action<string> loginFail)
         {
             _googleLoginManager.Login(loginSuccess, loginFail);
         }
 
+        /// <summary>
+        /// 登出当前 Google 账号。
+        /// </summary>
         [UnityEngine.Scripting.Preserve]
         public void LogOut()
         {
             _googleLoginManager.LogOut();
         }
-
-        // internal void ProcessAuthentication(SignInStatus status)
-        // {
-        //     if (status == SignInStatus.Success)
-        //     {
-        //         // Continue with Play Games Services
-        //     }
-        //     else
-        //     {
-        //         // 停用与 Play 游戏服务的集成或显示登录按钮 以请求用户登录。单击它应该会调用
-        //         PlayGamesPlatform.Instance.ManuallyAuthenticate(ProcessAuthentication);
-        //     }
-        // }
     }
 }
