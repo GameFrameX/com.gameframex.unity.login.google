@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/gameframex/com.gameframex.unity.login.google/compare/1.0.1...1.1.0) (2026-01-20)
+
+
+### Features
+
+* **登录:** 添加Google登录渠道支持并更新依赖 ([a874465](https://github.com/gameframex/com.gameframex.unity.login.google/commit/a874465a508a01a2aa104dbc09aaa755641fd2d3))
+
 ## [1.0.1](https://github.com/gameframex/com.gameframex.unity.login.google/compare/1.0.0...1.0.1) (2026-01-20)
 
 
