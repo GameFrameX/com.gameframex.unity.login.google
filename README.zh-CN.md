@@ -1,0 +1,107 @@
+<div align="center">
+  <img src="https://download.alianblank.com/gameframex/gameframex_logo_320.png" alt="Game Frame X Logo" width="160" />
+</div>
+
+# Game Frame X Google 登录
+
+[![GitHub release](https://img.shields.io/github/v/release/GameFrameX/com.gameframex.unity.login.google?style=flat-square)](https://github.com/GameFrameX/com.gameframex.unity.login.google/releases)
+[![License](https://img.shields.io/github/license/GameFrameX/com.gameframex.unity.login.google?style=flat-square)](https://github.com/GameFrameX/com.gameframex.unity.login.google/blob/main/LICENSE.md)
+[![Documentation](https://img.shields.io/badge/Documentation-Online-blue?style=flat-square)](https://gameframex.doc.alianblank.com)
+
+**独立游戏前后端一体化解决方案 · 独立游戏开发者的圆梦大使**
+
+[文档](https://gameframex.doc.alianblank.com) · [快速开始](#快速开始) · [QQ群](https://qm.qq.com/q/5s5e1e6e6e)
+
+**语言**: [English](README.md) | **简体中文** | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | [한국어](README.ko.md)
+
+---
+
+## 项目简介
+
+Game Frame X Google 登录是 GameFrameX 框架的 Google 登录组件，提供初始化、登录和登出功能。
+
+## 快速开始
+
+### 安装
+
+任选以下方式之一：
+
+1. 直接在 `manifest.json` 的文件中的 `dependencies` 节点下添加以下内容：
+   ```json
+   {"com.gameframex.unity.login.google": "https://github.com/AlianBlank/com.gameframex.unity.login.google.git"}
+   ```
+
+2. 在 Unity 的 `Packages Manager` 中使用 `Git URL` 的方式添加库，地址为：
+   ```
+   https://github.com/AlianBlank/com.gameframex.unity.login.google.git
+   ```
+
+3. 直接下载仓库放置到 Unity 项目的 `Packages` 目录下，会自动加载识别。
+
+## 使用示例
+
+1. 在 `GameEntry` 游戏入口对象上挂载 `GoogleLoginComponent` 组件。
+2. 在 `GoogleLoginComponent` 组件上设置 `ProjectId`。
+3. 调用方法：
+
+```csharp
+// 获取 Google 登录组件
+var googleLoginComponent = GameEntry.GetComponent<GoogleLoginComponent>();
+
+// 初始化
+googleLoginComponent.Init();
+
+// 登录
+googleLoginComponent.Login(
+    (googleLoginSuccess) =>
+    {
+        Debug.Log($"登录成功! {JsonUtility.ToJson(googleLoginSuccess)}");
+    },
+    (code) =>
+    {
+        Debug.LogError($"登录失败! {code}");
+    });
+
+// 登出
+googleLoginComponent.LogOut();
+```
+
+## 平台配置
+
+### Android
+
+1. 在项目 `res/values/strings.xml` 文件中添加 `game_services_project_id` 字符串资源：
+   ```xml
+   <?xml version="1.0" encoding="utf-8"?>
+   <resources>
+       <string name="game_services_project_id">YOUR_PROJECT_ID</string>
+   </resources>
+   ```
+
+2. 在 `AndroidManifest.xml` 文件的 `application` 节点下添加 `meta-data`：
+   ```xml
+   <meta-data
+       android:name="com.google.android.gms.games.APP_ID"
+       android:value="@string/game_services_project_id"/>
+   ```
+
+3. 在 `build.gradle` 文件中添加库引用：
+   ```groovy
+   implementation 'com.google.android.gms:play-services-games-v2:+'
+   implementation 'com.google.android.gms:play-services-auth:19.0.0'
+   ```
+
+## 依赖项
+
+- `com.gameframex.unity`: GameFrameX 核心框架
+- `com.gameframex.unity.getchannel`: 渠道管理
+
+## 文档与资源
+
+- 文档地址: https://gameframex.doc.alianblank.com
+- 仓库地址: https://github.com/GameFrameX/com.gameframex.unity.login.google
+- 问题反馈: https://github.com/GameFrameX/com.gameframex.unity.login.google/issues
+
+## 开源协议
+
+本项目遵循 MIT 许可证。详细信息请查看 [LICENSE](LICENSE.md) 文件。
