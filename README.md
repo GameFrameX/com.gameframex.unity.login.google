@@ -121,6 +121,14 @@ googleLoginComponent.LogOut();
 - Repository: https://github.com/GameFrameX/com.gameframex.unity.login.google
 - Issues: https://github.com/GameFrameX/com.gameframex.unity.login.google/issues
 
+
+## Community & Support
+
+- QQ Group: 467608841 / 233840761
+
+## Changelog
+
+See [Releases](https://github.com/GameFrameX/gameframex/com.gameframex.unity.login.google/releases) for changelog.
 ## License
 
 See [LICENSE.md](LICENSE.md) for license information.

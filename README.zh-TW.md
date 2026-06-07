@@ -122,6 +122,21 @@ googleLoginComponent.LogOut();
 - 倉庫地址: https://github.com/GameFrameX/com.gameframex.unity.login.google
 - 問題反饋: https://github.com/GameFrameX/com.gameframex.unity.login.google/issues
 
+
+## 依賴
+
+| 套件 | 說明 |
+|------|------|
+| `com.gameframex.unity` | 1.1.1 |
+| `com.gameframex.unity.getchannel` | 1.2.0 |
+
+## 社區與支援
+
+- QQ群: 467608841 / 233840761
+
+## 更新日誌
+
+查看 [Releases](https://github.com/GameFrameX/gameframex/com.gameframex.unity.login.google/releases) 了解更新日誌。
 ## 開源協議
 
 本項目遵循 MIT 許可證。詳細信息請查看 [LICENSE](LICENSE.md) 文件。

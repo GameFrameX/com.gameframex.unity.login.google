@@ -121,6 +121,14 @@ googleLoginComponent.LogOut();
 - リポジトリ: https://github.com/GameFrameX/com.gameframex.unity.login.google
 - Issues: https://github.com/GameFrameX/com.gameframex.unity.login.google/issues
 
+
+## コミュニティとサポート
+
+- QQグループ: 467608841 / 233840761
+
+## 変更履歴
+
+[Releases](https://github.com/GameFrameX/gameframex/com.gameframex.unity.login.google/releases) で変更履歴を確認してください。
 ## ライセンス
 
 詳しくは [LICENSE.md](LICENSE.md) をご参照ください。
