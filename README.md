@@ -57,7 +57,6 @@ Then add the package to `dependencies`:
 }
 ```
 
-
 ## Usage Examples
 
 1. Attach the `GoogleLoginComponent` component to the `GameEntry` game object.
@@ -124,4 +123,4 @@ googleLoginComponent.LogOut();
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE.md) for details.
+See [LICENSE.md](LICENSE.md) for license information.

@@ -57,7 +57,6 @@ Then add the package to `dependencies`:
 }
 ```
 
-
 ## 使用例
 
 1. `GameEntry` ゲームオブジェクトに `GoogleLoginComponent` コンポーネントをアタッチ。
@@ -124,4 +123,4 @@ googleLoginComponent.LogOut();
 
 ## ライセンス
 
-このプロジェクトは MIT ライセンスの下で公開されています。詳細は [LICENSE](LICENSE.md) ファイルを参照してください。
+詳しくは [LICENSE.md](LICENSE.md) をご参照ください。
