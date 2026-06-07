@@ -29,19 +29,34 @@ Game Frame X Google ログインは、GameFrameX フレームワークの Google
 
 ### インストール
 
-以下のいずれかの方法をお選びください：
+Unity プロジェクトの `Packages/manifest.json` を編集し、`scopedRegistries` セクションを追加してください：
 
-1. プロジェクトの `manifest.json` の `dependencies` セクションに以下を追加：
-   ```json
-   {"com.gameframex.unity.login.google": "https://github.com/AlianBlank/com.gameframex.unity.login.google.git"}
-   ```
+```json
+{
+  "scopedRegistries": [
+    {
+      "name": "GameFrameX",
+      "url": "https://gameframex.upm.alianblank.uk",
+      "scopes": [
+        "com.gameframex"
+      ]
+    }
+  ]
+}
+```
 
-2. Unity の Package Manager で `Git URL` を使用：
-   ```
-   https://github.com/AlianBlank/com.gameframex.unity.login.google.git
-   ```
+`scopes` は、どのパッケージをこのレジストリから解決するかを制御します。`com.gameframex` で始まるパッケージのみがこのレジストリから取得されます。
 
-3. リポジトリをダウンロードして Unity プロジェクトの `Packages` ディレクトリに配置。自動的にロードされます。
+Then add the package to `dependencies`:
+
+```json
+{
+  "dependencies": {
+    "com.gameframex.unity.login.google": "1.1.0"
+  }
+}
+```
+
 
 ## 使用例
 
