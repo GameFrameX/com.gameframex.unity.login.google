@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/gameframex/com.gameframex.unity.login.google/compare/1.1.0...1.1.1) (2026-06-08)
+
+
+### Bug Fixes
+
+* 补全包规范文件（LICENSE/CHANGELOG/URL 字段/unity 字段） ([0281000](https://github.com/gameframex/com.gameframex.unity.login.google/commit/028100039d0f686593637e650df655141269669e))
+
 # [1.1.0](https://github.com/gameframex/com.gameframex.unity.login.google/compare/1.0.1...1.1.0) (2026-01-20)
 
 
