@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/gameframex/com.gameframex.unity.login.google/compare/1.1.1...1.1.2) (2026-07-30)
+
+
+### Bug Fixes
+
+* 更新依赖版本至 com.gameframex.unity 2.5.1 和 com.gameframex.unity.getchannel 1.3.2 ([7eab48b](https://github.com/gameframex/com.gameframex.unity.login.google/commit/7eab48bac49ea04ca64d6758ad9dd9c1a6442a6e))
+
 ## [1.1.1](https://github.com/gameframex/com.gameframex.unity.login.google/compare/1.1.0...1.1.1) (2026-06-08)
 
 
