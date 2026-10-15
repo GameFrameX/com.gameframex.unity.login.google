@@ -1,3 +1,43 @@
+# [3.0.0](https://github.com/gameframex/com.gameframex.unity.login.google/compare/2.0.0...3.0.0) (2026-10-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* **login:** login 域收敛为渠道注册表形态：本包改为 `com.gameframex.unity.login` 核心包的 Google 渠道包，Bootstrap 自注册进 `LoginChannelRegistry`，删除 per-provider 组件与 GameApp partial
+
+**迁移对照：**
+
+| 旧形态 | 新形态 | 迁移方式 |
+|---|---|---|
+| `GoogleLoginComponent`（挂场景 + Inspector） | `LoginComponent`（login 核心包唯一门面） | 删除场景上的 `GoogleLoginComponent`，改挂 / 自动注入 `LoginComponent`；Google 为 Android / iOS 平台默认渠道 |
+| `GameApp.GoogleLogin` | `GameApp.Login` | 宏 `ENABLE_GAME_FRAME_X_GOOGLE_LOGIN` → `ENABLE_GAME_FRAME_X_LOGIN`（由 login 核心包装载决定） |
+| `IGoogleLoginManager` | `ILoginManager`（login 核心包） | 实现方改继承 `BaseLoginManager`；业务侧经 `GameApp.Login` 门面访问 |
+| `GoogleLoginSuccess.IdToken` | `GoogleLoginResult.Token`（基类 `LoginResult.Token` 统一承载渠道令牌） | 服务器校验方改读 `Token`；`PlayerId` 登录成功后同步写入基类 `OpenId` |
+| 回调式 `Login(Action<GoogleLoginSuccess>, Action<string>)` | 事件式 `OnLoginSuccess` / `OnLoginFailed` 聚合 + 一次性回调重载 `GameApp.Login.Login(onSuccess, onFailed)` | 订阅组件事件，或使用门面一次性回调重载 |
+| 组件 `Init()`（组件 Awake 读 projectId） | `GoogleLoginManager.Init()`（渠道自读 `googleProjectId`） | 调用点从组件平移到 `GameApp.Login.Init()`，配置读取方式不变 |
+
+本包变更：`GoogleLoginManager` 改继承 `BaseLoginManager` 并实现 `ILoginManager`；新增 `GoogleLoginBootstrap`（`BeforeSceneLoad` 自注册 `"Google"`）；`GoogleLoginSuccess` → `GoogleLoginResult`（继承 `LoginResult`，`IdToken` 收敛到基类 `Token`）；删除 `GoogleLoginComponent` / `GoogleLoginComponentInspector` / `IGoogleLoginManager`；`GoogleLoginLinkBridge` 回调承载类型同步为 `GoogleLoginResult`（native 桥实现不动）；asmdef 与 package.json 增 `com.gameframex.unity.login` 依赖。
+
+# [2.0.0](https://github.com/gameframex/com.gameframex.unity.login.google/compare/1.1.2...2.0.0) (2026-10-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* **module:** 模块契约全接口化：删除 `GameFrameworkModule` 抽象基类，改为 `IGameFrameworkModule` 标记接口 + 可选能力接口
+
+**新契约形态与迁移对照：**
+
+| 旧基类成员 | 新契约 | 迁移方式 |
+|---|---|---|
+| `: GameFrameworkModule` | `IGameFrameworkModule` | 声明处直接替换（标记接口，可注册进 `GameFrameworkEntry`） |
+| `override void Update(float, float)` | `IUpdatableModule` | 真实实现改 `public`；空实现删除（未实现者不再被轮询） |
+| `override void Shutdown()` | `IShutdownableModule` | 真实实现改 `public`；空实现删除（未实现者不再被关闭） |
+| `override int Priority` | `IPrioritizedModule` | 改 `public int Priority { get; }`；未实现视为 0 |
+
+本包变更：`GoogleLoginManager` 声明迁移至 `IGameFrameworkModule`，删除空 `Update` / `Shutdown` 覆写。
+
+`GameFrameworkEntry.Update` 仅分派 `IUpdatableModule`；`Shutdown` 按优先级反序仅分派 `IShutdownableModule`；tick 与关闭顺序与旧实现完全一致。能力方法仅由宿主入口调用，业务侧继续通过 `GetModule<IXxxManager>()` 访问模块。
+
 ## [1.1.2](https://github.com/gameframex/com.gameframex.unity.login.google/compare/1.1.1...1.1.2) (2026-07-30)
 
 

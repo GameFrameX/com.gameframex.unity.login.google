@@ -2,7 +2,7 @@
 
 <img src="https://download.alianblank.com/gameframex/gameframex_logo_320.png" alt="Game Frame X Logo" width="160" />
 
-# Game Frame X Google 로그인
+# Game Frame X Google Login
 
 [![License](https://img.shields.io/github/license/GameFrameX/com.gameframex.unity.login.google)](https://github.com/GameFrameX/com.gameframex.unity.login.google/blob/main/LICENSE.md)
 [![Version](https://img.shields.io/github/v/release/GameFrameX/com.gameframex.unity.login.google)](https://github.com/GameFrameX/com.gameframex.unity.login.google/releases)
@@ -17,21 +17,28 @@
 
 <br />
 
-[English](README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | **한국어**
+[English](../../README.md) | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md) | [日本語](README.ja.md) | **한국어**
 
 </div>
 
 ## 프로젝트 개요
 
-Game Frame X Google 로그인은 GameFrameX 프레임워크의 Google 로그인 컴포넌트로, 초기화, 로그인 및 로그아웃 기능을 제공합니다.
+**Google 로그인 채널** - GameFrameX 로그인 채널 레지스트리의 Google 채널 패키지. `GoogleLoginManager`로 `ILoginManager`를 구현하고, 시작 시 `GoogleLoginBootstrap`을 통해 `LoginChannelRegistry`에 자동 등록합니다(패키지 설치만으로 활성화). `GoogleLoginResult`(`LoginResult` 하위 클래스, IdToken은 통합 `Token` 필드로 전달)를 반환합니다.
+
+### 기능
+
+- `GoogleLoginManager`로 `ILoginManager` Google 채널 구현. `GoogleLoginBootstrap`이 `BeforeSceneLoad`에서 `LoginChannelRegistry`에 자동 등록(채널 ID `"Google"`). 패키지 설치만으로 활성화되며 씬과 entry 패키지 변경 불필요
+- `GoogleLoginResult : LoginResult`는 `FamilyName` / `GivenName` / `PlayerId` 유지. IdToken은 통합 `Token` 필드로 전달되고 `PlayerId`는 `OpenId`에도 기록됩니다
+- 채널 설정은 채널 패키지가 직접 읽습니다: BlankGetChannel을 통해 `googleProjectId` 읽기(Web 클라이언트 ID여야 함)
+- Google은 `LoginComponent`의 Android / iOS 플랫폼 기본 관리자. Editor에서는 스텁 데이터를 반환해 흐름 검증 가능
 
 ## 빠른 시작
 
 ### 설치
 
-다음 방법 중 하나를 선택하세요:
+아래 방법 중 하나를 선택하세요:
 
-1. Unity 프로젝트의 `Packages/manifest.json`을 편집하여 `scopedRegistries` 섹션을 추가하세요:
+1. Edit your Unity project's `Packages/manifest.json` and add the `scopedRegistries` section:
    ```json
    {
      "scopedRegistries": [
@@ -44,93 +51,101 @@ Game Frame X Google 로그인은 GameFrameX 프레임워크의 Google 로그인 
        }
      ],
      "dependencies": {
-       "com.gameframex.unity.login.google": "1.1.0"
+       "com.gameframex.unity.login.google": "3.0.0"
      }
    }
    ```
 
-   `scopes`는 이 레지스트리를 통해 어떤 패키지를 해석할지 제어합니다. `com.gameframex`로 시작하는 패키지만 이 레지스트리에서 가져옵니다.
+   `scopes`는 이 레지스트리를 통해 해석될 패키지를 제어합니다. `com.gameframex`로 시작하는 패키지만 이 레지스트리에서 가져옵니다.
 
-2. `manifest.json`의 `dependencies`에 직접 추가:
+2. Add to `manifest.json` dependencies:
    ```json
    {
       "com.gameframex.unity.login.google": "https://github.com/gameframex/com.gameframex.unity.login.google.git"
    }
    ```
-3. Unity의 **Package Manager**에서 **Git URL**을 사용하여 추가: `https://github.com/gameframex/com.gameframex.unity.login.google.git`
-4. 리포지토리를 Unity 프로젝트의 `Packages` 디렉토리에 클론하세요. 자동으로 로드됩니다.
+3. Use **Package Manager** in Unity with **Git URL**: `https://github.com/gameframex/com.gameframex.unity.login.google.git`
+4. Clone the repository into your Unity project's `Packages` directory. It will be loaded automatically.
+
 ## 사용 예시
 
-1. `GameEntry` 게임 오브젝트에 `GoogleLoginComponent` 컴포넌트를 연결합니다.
-2. `GoogleLoginComponent` 컴포넌트에 `ProjectId`를 설정합니다.
-3. 메서드를 호출합니다:
-
 ```csharp
-// Google 로그인 컴포넌트 가져오기
-var googleLoginComponent = GameEntry.GetComponent<GoogleLoginComponent>();
+using GameFrameX.Login.Runtime;
+using UnityEngine;
 
-// 초기화
-googleLoginComponent.Init();
-
-// 로그인
-googleLoginComponent.Login(
-    (googleLoginSuccess) =>
+public class GoogleLoginDemo : MonoBehaviour
+{
+    void Start()
     {
-        Debug.Log($"로그인 성공! {JsonUtility.ToJson(googleLoginSuccess)}");
-    },
-    (code) =>
-    {
-        Debug.LogError($"로그인 실패! {code}");
-    });
+        // 이 패키지를 설치하면 Google이 BeforeSceneLoad에서 LoginChannelRegistry에 자동 등록됩니다.
+        // LoginComponent 파사드로 통일된 접근(per-channel 컴포넌트 없음)
+        var login = GameEntry.GetComponent<LoginComponent>(); // 또는 GameApp.Login
 
-// 로그아웃
-googleLoginComponent.LogOut();
+        login.OnLoginSuccess += (sender, e) =>
+        {
+            var google = e.Result as GoogleLoginResult; // 채널 고유 필드가 필요하면 다운캐스트
+            Debug.Log($"token={e.Result.Token} openId={e.Result.OpenId} playerId={google?.PlayerId}");
+        };
+
+        login.Init();                          // 내부에서 BlankGetChannel로 googleProjectId 읽기
+        login.Login(new LoginParams("Google")); // 명시적 라우팅(비어 있으면 플랫폼 기본 채널)
+    }
+}
 ```
 
-## 플랫폼 설정
+**채널 설정**: `googleProjectId`(Web 클라이언트 ID여야 함)는 채널 패키지가 BlankGetChannel을 통해 직접 읽습니다. 다른 채널 값과 동일한 방식으로 설정합니다(예: `BlankGetChannel.GetChannelName("googleProjectId")`).
 
-### Android
+## 아키텍처
 
-1. `res/values/strings.xml`에 `game_services_project_id` 문자열 리소스 추가:
-   ```xml
-   <?xml version="1.0" encoding="utf-8"?>
-   <resources>
-       <string name="game_services_project_id">YOUR_PROJECT_ID</string>
-   </resources>
-   ```
+### 자동 등록 시맨틱
 
-2. `AndroidManifest.xml`의 `application` 노드에 `meta-data` 추가:
-   ```xml
-   <meta-data
-       android:name="com.google.android.gms.games.APP_ID"
-       android:value="@string/game_services_project_id"/>
-   ```
+`GoogleLoginBootstrap`는 `RuntimeInitializeOnLoadMethod(BeforeSceneLoad)`(`LoginComponent.Awake`보다 이른 시점)에서 `"Google"` 채널(팩토리 `() => new GoogleLoginManager()`)을 `LoginChannelRegistry`에 등록합니다. 이 패키지가 없으면 코드가 스트리핑되어 등록이 발생하지 않습니다. 설치 / 미설치 두 가지 프로젝트 형태 모두 컴파일 및 실행 가능합니다.
 
-3. `build.gradle`에 라이브러리 참조 추가:
-   ```groovy
-   implementation 'com.google.android.gms:play-services-games-v2:+'
-   implementation 'com.google.android.gms:play-services-auth:19.0.0'
-   ```
+### 핵심 패키지와의 관계
 
-## 의존성
+- `com.gameframex.unity.login`만 의존(`com.gameframex.unity` 및 BlankGetChannel 포함).
+- Google은 `LoginComponent`의 Android / iOS 플랫폼 기본 관리자 타입(직렬화된 타입 이름 문자열. 구현이 없으면 `DefaultLoginManager`로 폴백).
+- `LoginParams.ChannelId = "Google"` 명시적 라우팅. 비어 있으면 플랫폼 기본으로(동일 인스턴스, 이중화 없음).
 
-- `com.gameframex.unity`: GameFrameX 핵심 프레임워크
-- `com.gameframex.unity.getchannel`: 채널 관리
+### 마이그레이션 안내(2.x -> 3.0.0)
+
+| 이전 | 새 |
+|------|-----|
+| `GoogleLoginComponent` | `LoginComponent`(핵심 패키지. 씬의 기존 컴포넌트 삭제) |
+| `GameApp.GoogleLogin` | `GameApp.Login`(정의 -> `ENABLE_GAME_FRAME_X_LOGIN`) |
+| `GoogleLoginSuccess.IdToken` | `GoogleLoginResult.Token`(서버 검증은 `Token` 읽기) |
+| `googleLoginComponent.Login(onSuccess, onFail)` | `login.Login(onSuccess, onFailed)` 일회성 오버로드 또는 통합 이벤트 |
+| 컴포넌트 `Init()` | `GameApp.Login.Init()`(`googleProjectId` 읽기 방식은 동일) |
+
+## 플랫폼 지원
+
+| 플랫폼 | 지원 |
+|----------|-----------|
+| Android | 지원(네이티브 브리지) |
+| iOS | 지원(네이티브 브리지) |
+| Editor | 지원(스텁) |
 
 ## 문서 및 자료
 
-- 문서: https://gameframex.doc.alianblank.com
-- 저장소: https://github.com/GameFrameX/com.gameframex.unity.login.google
-- Issues: https://github.com/GameFrameX/com.gameframex.unity.login.google/issues
-
+- [문서](https://gameframex.doc.alianblank.com)
+- [GitHub 저장소](https://github.com/GameFrameX/com.gameframex.unity.login.google)
 
 ## 커뮤니티 및 지원
 
-- QQ 그룹: 467608841 / 233840761
+- QQ 그룹: [QR 코드](https://qm.qq.com/cgi-bin/qm/qr?k=ikT9gA5m2sKwOyNOfYmQvSAPK_c3GmD6)로 참여
+
+## 의존성
+
+| 패키지 | 버전 |
+|---------|---------|
+| `com.gameframex.unity` | 2.5.4 |
+| `com.gameframex.unity.getchannel` | 1.3.2 |
+| `com.gameframex.unity.login` | 1.0.0 |
 
 ## 변경 로그
 
-[Releases](https://github.com/GameFrameX/gameframex/com.gameframex.unity.login.google/releases)에서 변경 로그를 확인하세요.
+변경 로그는 [Releases](https://github.com/gameframex/com.gameframex.unity.login.google/releases)를 참조하세요.
+
 ## 라이선스
 
 자세한 내용은 [LICENSE.md](LICENSE.md) 파일을 참조하세요.

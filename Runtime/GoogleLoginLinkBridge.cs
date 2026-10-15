@@ -70,8 +70,8 @@ namespace GameFrameX.Login.Google.Runtime
             if (errorCode == 0)
             {
                 // success
-                GoogleLoginSuccess success = Utility.Json.ToObject<GoogleLoginSuccess>(jsonString);
-                _loginSuccess?.Invoke(success);
+                GoogleLoginResult result = Utility.Json.ToObject<GoogleLoginResult>(jsonString);
+                _loginSuccess?.Invoke(result);
             }
             else
             {
@@ -92,7 +92,7 @@ namespace GameFrameX.Login.Google.Runtime
 
         private string _projectId;
 
-        private Action<GoogleLoginSuccess> _loginSuccess;
+        private Action<GoogleLoginResult> _loginSuccess;
         private Action<string> _loginFail;
 
         /// <summary>
@@ -101,17 +101,16 @@ namespace GameFrameX.Login.Google.Runtime
         /// <param name="loginSuccess">登录成功回调</param>
         /// <param name="loginFail">登录失败回调</param>
         [UnityEngine.Scripting.Preserve]
-        public void SignIn(Action<GoogleLoginSuccess> loginSuccess, Action<string> loginFail)
+        public void SignIn(Action<GoogleLoginResult> loginSuccess, Action<string> loginFail)
         {
             _loginSuccess = loginSuccess;
             _loginFail = loginFail;
 #if UNITY_EDITOR
-            var googleLoginSuccess = new GoogleLoginSuccess();
-            googleLoginSuccess.PlayerId = SystemInfo.deviceUniqueIdentifier;
-            googleLoginSuccess.IdToken = "test_login@google.com";
-            googleLoginSuccess.DisplayName = "Editor_Google_Test";
-            googleLoginSuccess.IdToken = SystemInfo.deviceUniqueIdentifier;
-            loginSuccess?.Invoke(googleLoginSuccess);
+            var result = new GoogleLoginResult();
+            result.PlayerId = SystemInfo.deviceUniqueIdentifier;
+            result.Token = SystemInfo.deviceUniqueIdentifier;
+            result.DisplayName = "Editor_Google_Test";
+            loginSuccess?.Invoke(result);
             return;
 #endif
 

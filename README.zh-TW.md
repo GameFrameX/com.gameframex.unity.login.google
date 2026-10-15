@@ -2,7 +2,7 @@
 
 <img src="https://download.alianblank.com/gameframex/gameframex_logo_320.png" alt="Game Frame X Logo" width="160" />
 
-# Game Frame X Google 登錄
+# Game Frame X Google Login
 
 [![License](https://img.shields.io/github/license/GameFrameX/com.gameframex.unity.login.google)](https://github.com/GameFrameX/com.gameframex.unity.login.google/blob/main/LICENSE.md)
 [![Version](https://img.shields.io/github/v/release/GameFrameX/com.gameframex.unity.login.google)](https://github.com/GameFrameX/com.gameframex.unity.login.google/releases)
@@ -17,21 +17,28 @@
 
 <br />
 
-[English](README.md) | [简体中文](README.zh-CN.md) | **繁體中文** | [日本語](README.ja.md) | [한국어](README.ko.md)
+[English](../../README.md) | [简体中文](README.zh-CN.md) | **繁體中文** | [日本語](README.ja.md) | [한국어](README.ko.md)
 
 </div>
 
 ## 項目簡介
 
-Game Frame X Google 登錄是 GameFrameX 框架的 Google 登錄組件，提供初始化、登錄和登出功能。
+**Google 登入渠道** - GameFrameX 登入渠道註冊表的 Google 渠道包。以 `GoogleLoginManager` 實現 `ILoginManager`，啟動時經 `GoogleLoginBootstrap` 自註冊進 `LoginChannelRegistry`（裝包即生效），返回 `GoogleLoginResult`（`LoginResult` 子類；IdToken 由統一 `Token` 欄位承載）。
+
+### 功能特性
+
+- 以 `GoogleLoginManager` 實現 `ILoginManager` Google 渠道；經 `GoogleLoginBootstrap` 在 `BeforeSceneLoad` 自註冊進 `LoginChannelRegistry`（渠道標識 `"Google"`）——裝包即生效，場景與 entry 包零改動
+- `GoogleLoginResult : LoginResult` 保留 `FamilyName` / `GivenName` / `PlayerId`；IdToken 由統一 `Token` 欄位承載，`PlayerId` 同時寫入 `OpenId`
+- 渠道配置由渠道包自讀：經 BlankGetChannel 讀取 `googleProjectId`（必須是 Web 端 ClientId）
+- Google 是 `LoginComponent` 的 Android / iOS 平台預設管理器；Editor 下返回樁資料供流程驗證
 
 ## 快速開始
 
 ### 安裝
 
-選擇以下任一方式：
+選擇以下任意一種安裝方式：
 
-1. 編輯 Unity 專案的 `Packages/manifest.json`，添加 `scopedRegistries` 部分：
+1. Edit your Unity project's `Packages/manifest.json` and add the `scopedRegistries` section:
    ```json
    {
      "scopedRegistries": [
@@ -44,100 +51,101 @@ Game Frame X Google 登錄是 GameFrameX 框架的 Google 登錄組件，提供�
        }
      ],
      "dependencies": {
-       "com.gameframex.unity.login.google": "1.1.0"
+       "com.gameframex.unity.login.google": "3.0.0"
      }
    }
    ```
 
-   `scopes` 控制哪些套件透過此註冊表解析。只有以 `com.gameframex` 開頭的套件才會從這個註冊表取得。
+   `scopes` 控制哪些包會通過該註冊表解析。只有名稱以 `com.gameframex` 開頭的包才會從該註冊表獲取。
 
-2. 直接在 `manifest.json` 的 `dependencies` 節點下添加以下內容：
+2. Add to `manifest.json` dependencies:
    ```json
    {
       "com.gameframex.unity.login.google": "https://github.com/gameframex/com.gameframex.unity.login.google.git"
    }
    ```
-3. 在 Unity 的 `Package Manager` 中使用 `Git URL` 的方式添加庫，地址為：`https://github.com/gameframex/com.gameframex.unity.login.google.git`
-4. 直接下載倉庫放置到 Unity 專案的 `Packages` 目錄下，會自動載入識別。
+3. Use **Package Manager** in Unity with **Git URL**: `https://github.com/gameframex/com.gameframex.unity.login.google.git`
+4. Clone the repository into your Unity project's `Packages` directory. It will be loaded automatically.
+
 ## 使用範例
 
-1. 在 `GameEntry` 遊戲入口對象上掛載 `GoogleLoginComponent` 組件。
-2. 在 `GoogleLoginComponent` 組件上設置 `ProjectId`。
-3. 調用方法：
-
 ```csharp
-// 獲取 Google 登錄組件
-var googleLoginComponent = GameEntry.GetComponent<GoogleLoginComponent>();
+using GameFrameX.Login.Runtime;
+using UnityEngine;
 
-// 初始化
-googleLoginComponent.Init();
-
-// 登錄
-googleLoginComponent.Login(
-    (googleLoginSuccess) =>
+public class GoogleLoginDemo : MonoBehaviour
+{
+    void Start()
     {
-        Debug.Log($"登錄成功! {JsonUtility.ToJson(googleLoginSuccess)}");
-    },
-    (code) =>
-    {
-        Debug.LogError($"登錄失敗! {code}");
-    });
+        // 安裝本包後 Google 在 BeforeSceneLoad 自動註冊進 LoginChannelRegistry；
+        // 統一經 LoginComponent 門面存取（不再有 per-channel 組件）
+        var login = GameEntry.GetComponent<LoginComponent>(); // 或 GameApp.Login
 
-// 登出
-googleLoginComponent.LogOut();
+        login.OnLoginSuccess += (sender, e) =>
+        {
+            var google = e.Result as GoogleLoginResult; // 需要渠道特有欄位時向下轉型
+            Debug.Log($"token={e.Result.Token} openId={e.Result.OpenId} playerId={google?.PlayerId}");
+        };
+
+        login.Init();                          // 內部經 BlankGetChannel 讀取 googleProjectId
+        login.Login(new LoginParams("Google")); // 顯式路由（留空則走平台預設渠道）
+    }
+}
 ```
 
-## 平台配置
+**渠道配置**：`googleProjectId`（必須是 Web 端 ClientId）由渠道包經 BlankGetChannel 自讀——與其他渠道值的配置方式一致（如 `BlankGetChannel.GetChannelName("googleProjectId")`）。
 
-### Android
+## 架構概覽
 
-1. 在項目 `res/values/strings.xml` 文件中添加 `game_services_project_id` 字符串資源：
-   ```xml
-   <?xml version="1.0" encoding="utf-8"?>
-   <resources>
-       <string name="game_services_project_id">YOUR_PROJECT_ID</string>
-   </resources>
-   ```
+### 自註冊語義
 
-2. 在 `AndroidManifest.xml` 文件的 `application` 節點下添加 `meta-data`：
-   ```xml
-   <meta-data
-       android:name="com.google.android.gms.games.APP_ID"
-       android:value="@string/game_services_project_id"/>
-   ```
+`GoogleLoginBootstrap` 在 `RuntimeInitializeOnLoadMethod(BeforeSceneLoad)`（早於 `LoginComponent.Awake`）將 `"Google"` 渠道（工廠 `() => new GoogleLoginManager()`）註冊進 `LoginChannelRegistry`。未安裝本包時代碼被裁剪、註冊不會發生；裝包 / 不裝包兩種工程形態均可編譯執行。
 
-3. 在 `build.gradle` 文件中添加庫引用：
-   ```groovy
-   implementation 'com.google.android.gms:play-services-games-v2:+'
-   implementation 'com.google.android.gms:play-services-auth:19.0.0'
-   ```
+### 與核心包的關係
 
-## 依賴項
+- 只依賴 `com.gameframex.unity.login`（外加 `com.gameframex.unity` 與 BlankGetChannel）。
+- Google 是 `LoginComponent` 上 Android / iOS 平台預設管理器類型（序列化類型名字串；實現缺失時回落 `DefaultLoginManager`）。
+- `LoginParams.ChannelId = "Google"` 顯式路由；為空回落平台預設（同一實例，無雙實例）。
 
-- `com.gameframex.unity`: GameFrameX 核心框架
-- `com.gameframex.unity.getchannel`: 渠道管理
+### 遷移說明（2.x -> 3.0.0）
+
+| 舊形態 | 新形態 |
+|--------|--------|
+| `GoogleLoginComponent` | `LoginComponent`（核心包；刪除場景上的舊組件） |
+| `GameApp.GoogleLogin` | `GameApp.Login`（宏 → `ENABLE_GAME_FRAME_X_LOGIN`） |
+| `GoogleLoginSuccess.IdToken` | `GoogleLoginResult.Token`（伺服器校驗方改讀 `Token`） |
+| `googleLoginComponent.Login(onSuccess, onFail)` | `login.Login(onSuccess, onFailed)` 一次性重載或聚合事件 |
+| 組件 `Init()` | `GameApp.Login.Init()`（`googleProjectId` 讀取方式不變） |
+
+## 平台支援
+
+| 平台 | 支援 |
+|------|------|
+| Android | 支援（native 橋） |
+| iOS | 支援（native 橋） |
+| Editor | 支援（樁資料） |
 
 ## 文檔與資源
 
-- 文檔地址: https://gameframex.doc.alianblank.com
-- 倉庫地址: https://github.com/GameFrameX/com.gameframex.unity.login.google
-- 問題反饋: https://github.com/GameFrameX/com.gameframex.unity.login.google/issues
-
-
-## 依賴
-
-| 套件 | 說明 |
-|------|------|
-| `com.gameframex.unity` | 1.1.1 |
-| `com.gameframex.unity.getchannel` | 1.2.0 |
+- [文檔](https://gameframex.doc.alianblank.com)
+- [GitHub 倉庫](https://github.com/GameFrameX/com.gameframex.unity.login.google)
 
 ## 社區與支援
 
-- QQ群: 467608841 / 233840761
+- QQ 群：透過[二維碼](https://qm.qq.com/cgi-bin/qm/qr?k=ikT9gA5m2sKwOyNOfYmQvSAPK_c3GmD6)加入
+
+## 依賴
+
+| 包 | 版本 |
+|-----|------|
+| `com.gameframex.unity` | 2.5.4 |
+| `com.gameframex.unity.getchannel` | 1.3.2 |
+| `com.gameframex.unity.login` | 1.0.0 |
 
 ## 更新日誌
 
-查看 [Releases](https://github.com/GameFrameX/gameframex/com.gameframex.unity.login.google/releases) 了解更新日誌。
+詳見 [Releases](https://github.com/gameframex/com.gameframex.unity.login.google/releases) 更新日誌。
+
 ## 開源協議
 
-本項目遵循 MIT 許可證。詳細信息請查看 [LICENSE](LICENSE.md) 文件。
+詳見 [LICENSE.md](LICENSE.md) 檔案。

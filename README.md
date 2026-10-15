@@ -23,7 +23,14 @@ All-in-One Solution for Indie Game Development · Empowering Indie Developers' D
 
 ## Project Overview
 
-Game Frame X Google Login is a Google login component for the GameFrameX framework, providing initialization, login, and logout capabilities.
+**Google Login Channel** - The Google channel package of the GameFrameX login channel registry. It implements `ILoginManager` as `GoogleLoginManager`, self-registers into `LoginChannelRegistry` at startup via `GoogleLoginBootstrap` (installing the package is all it takes), and returns `GoogleLoginResult` (subclass of `LoginResult`; the IdToken is carried by the unified `Token` field).
+
+### Features
+
+- Implements the `ILoginManager` Google channel; registers itself into `LoginChannelRegistry` at `BeforeSceneLoad` via `GoogleLoginBootstrap` (channel id `"Google"`) - installing the package is all it takes, no scene or entry package change required
+- `GoogleLoginResult : LoginResult` keeps `FamilyName` / `GivenName` / `PlayerId`; the IdToken is carried by the unified `Token` field and `PlayerId` is also written into `OpenId`
+- Channel config is read by the channel package itself: `googleProjectId` via BlankGetChannel (must be the Web client id)
+- Google is the Android / iOS platform default manager on `LoginComponent`; Editor runs a stub sign-in for flow verification
 
 ## Quick Start
 
@@ -44,7 +51,7 @@ Choose one of the following methods:
        }
      ],
      "dependencies": {
-       "com.gameframex.unity.login.google": "1.1.0"
+       "com.gameframex.unity.login.google": "3.0.0"
      }
    }
    ```
@@ -59,78 +66,86 @@ Choose one of the following methods:
    ```
 3. Use **Package Manager** in Unity with **Git URL**: `https://github.com/gameframex/com.gameframex.unity.login.google.git`
 4. Clone the repository into your Unity project's `Packages` directory. It will be loaded automatically.
+
 ## Usage Examples
 
-1. Attach the `GoogleLoginComponent` component to the `GameEntry` game object.
-2. Set the `ProjectId` on the `GoogleLoginComponent` component.
-3. Call the methods:
-
 ```csharp
-// Get Google login component
-var googleLoginComponent = GameEntry.GetComponent<GoogleLoginComponent>();
+using GameFrameX.Login.Runtime;
+using UnityEngine;
 
-// Initialize
-googleLoginComponent.Init();
-
-// Login
-googleLoginComponent.Login(
-    (googleLoginSuccess) =>
+public class GoogleLoginDemo : MonoBehaviour
+{
+    void Start()
     {
-        Debug.Log($"Login successful! {JsonUtility.ToJson(googleLoginSuccess)}");
-    },
-    (code) =>
-    {
-        Debug.LogError($"Login failed! {code}");
-    });
+        // Google registers itself into LoginChannelRegistry at BeforeSceneLoad when this
+        // package is installed; use the single LoginComponent facade (no per-channel component)
+        var login = GameEntry.GetComponent<LoginComponent>(); // or GameApp.Login
 
-// Logout
-googleLoginComponent.LogOut();
+        login.OnLoginSuccess += (sender, e) =>
+        {
+            var google = e.Result as GoogleLoginResult; // channel-specific fields when needed
+            Debug.Log($"token={e.Result.Token} openId={e.Result.OpenId} playerId={google?.PlayerId}");
+        };
+
+        login.Init();                          // reads googleProjectId via BlankGetChannel
+        login.Login(new LoginParams("Google")); // explicit routing (or empty for platform default)
+    }
+}
 ```
 
-## Platform Configuration
+**Channel config**: the `googleProjectId` (must be the Web client id) is read by the channel package itself via BlankGetChannel - configure it the same way as other channel values (e.g. `BlankGetChannel.GetChannelName("googleProjectId")`).
 
-### Android
+## Architecture
 
-1. Add the `game_services_project_id` string resource in `res/values/strings.xml`:
-   ```xml
-   <?xml version="1.0" encoding="utf-8"?>
-   <resources>
-       <string name="game_services_project_id">YOUR_PROJECT_ID</string>
-   </resources>
-   ```
+### Self-Registration Semantics
 
-2. Add `meta-data` in the `application` node of `AndroidManifest.xml`:
-   ```xml
-   <meta-data
-       android:name="com.google.android.gms.games.APP_ID"
-       android:value="@string/game_services_project_id"/>
-   ```
+`GoogleLoginBootstrap` registers the `"Google"` channel (factory `() => new GoogleLoginManager()`) into `LoginChannelRegistry` at `RuntimeInitializeOnLoadMethod(BeforeSceneLoad)` - earlier than `LoginComponent.Awake`. When this package is absent the code is stripped and the registration simply does not happen; projects with / without this package both compile and run.
 
-3. Add library references in `build.gradle`:
-   ```groovy
-   implementation 'com.google.android.gms:play-services-games-v2:+'
-   implementation 'com.google.android.gms:play-services-auth:19.0.0'
-   ```
+### Relationship with the core package
 
-## Dependencies
+- Depends only on `com.gameframex.unity.login` (plus `com.gameframex.unity` and BlankGetChannel).
+- Google is the Android / iOS platform default manager type on `LoginComponent` (serialized type-name string; a missing implementation falls back to `DefaultLoginManager`).
+- `LoginParams.ChannelId = "Google"` routes explicitly; empty falls back to the platform default (same instance, no duplication).
 
-- `com.gameframex.unity`: GameFrameX core framework
-- `com.gameframex.unity.getchannel`: Channel management
+### Migration (2.x -> 3.0.0)
+
+| Old | New |
+|-----|-----|
+| `GoogleLoginComponent` | `LoginComponent` (core package; delete the scene component) |
+| `GameApp.GoogleLogin` | `GameApp.Login` (define -> `ENABLE_GAME_FRAME_X_LOGIN`) |
+| `GoogleLoginSuccess.IdToken` | `GoogleLoginResult.Token` (server verification reads `Token`) |
+| `googleLoginComponent.Login(onSuccess, onFail)` | `login.Login(onSuccess, onFailed)` one-shot overload or aggregated events |
+| Component `Init()` | `GameApp.Login.Init()` (reads `googleProjectId` the same way) |
+
+## Platform Support
+
+| Platform | Supported |
+|----------|-----------|
+| Android | Yes (native bridge) |
+| iOS | Yes (native bridge) |
+| Editor | Yes (stub sign-in) |
 
 ## Documentation & Resources
 
-- Documentation: https://gameframex.doc.alianblank.com
-- Repository: https://github.com/GameFrameX/com.gameframex.unity.login.google
-- Issues: https://github.com/GameFrameX/com.gameframex.unity.login.google/issues
-
+- [Documentation](https://gameframex.doc.alianblank.com)
+- [GitHub Repository](https://github.com/GameFrameX/com.gameframex.unity.login.google)
 
 ## Community & Support
 
-- QQ Group: 467608841 / 233840761
+- QQ Group: Join via [QR Code](https://qm.qq.com/cgi-bin/qm/qr?k=ikT9gA5m2sKwOyNOfYmQvSAPK_c3GmD6)
+
+## Dependencies
+
+| Package | Version |
+|---------|---------|
+| `com.gameframex.unity` | 2.5.4 |
+| `com.gameframex.unity.getchannel` | 1.3.2 |
+| `com.gameframex.unity.login` | 1.0.0 |
 
 ## Changelog
 
-See [Releases](https://github.com/GameFrameX/gameframex/com.gameframex.unity.login.google/releases) for changelog.
+See [Releases](https://github.com/gameframex/com.gameframex.unity.login.google/releases) for changelog.
+
 ## License
 
 See [LICENSE.md](LICENSE.md) for license information.
