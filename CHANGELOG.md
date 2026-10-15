@@ -9,14 +9,14 @@
 
 | 旧形态 | 新形态 | 迁移方式 |
 |---|---|---|
-| `GoogleLoginComponent`（挂场景 + Inspector） | `LoginComponent`（login 核心包唯一门面） | 删除场景上的 `GoogleLoginComponent`，改挂 / 自动注入 `LoginComponent`；Google 为 Android / iOS 平台默认渠道 |
+| `GoogleLoginComponent`（挂场景 + Inspector） | `LoginComponent`（login 核心包唯一门面） | 删除场景上的 `GoogleLoginComponent`，改挂 / 自动注入 `LoginComponent`；Google 经 Bootstrap 宏墙在 Android / iOS（含 Editor 对应构建目标）注册为默认渠道 |
 | `GameApp.GoogleLogin` | `GameApp.Login` | 宏 `ENABLE_GAME_FRAME_X_GOOGLE_LOGIN` → `ENABLE_GAME_FRAME_X_LOGIN`（由 login 核心包装载决定） |
 | `IGoogleLoginManager` | `ILoginManager`（login 核心包） | 实现方改继承 `BaseLoginManager`；业务侧经 `GameApp.Login` 门面访问 |
 | `GoogleLoginSuccess.IdToken` | `GoogleLoginResult.Token`（基类 `LoginResult.Token` 统一承载渠道令牌） | 服务器校验方改读 `Token`；`PlayerId` 登录成功后同步写入基类 `OpenId` |
 | 回调式 `Login(Action<GoogleLoginSuccess>, Action<string>)` | 事件式 `OnLoginSuccess` / `OnLoginFailed` 聚合 + 一次性回调重载 `GameApp.Login.Login(onSuccess, onFailed)` | 订阅组件事件，或使用门面一次性回调重载 |
 | 组件 `Init()`（组件 Awake 读 projectId） | `GoogleLoginManager.Init()`（渠道自读 `googleProjectId`） | 调用点从组件平移到 `GameApp.Login.Init()`，配置读取方式不变 |
 
-本包变更：`GoogleLoginManager` 改继承 `BaseLoginManager` 并实现 `ILoginManager`；新增 `GoogleLoginBootstrap`（`BeforeSceneLoad` 自注册 `"Google"`）；`GoogleLoginSuccess` → `GoogleLoginResult`（继承 `LoginResult`，`IdToken` 收敛到基类 `Token`）；删除 `GoogleLoginComponent` / `GoogleLoginComponentInspector` / `IGoogleLoginManager`；`GoogleLoginLinkBridge` 回调承载类型同步为 `GoogleLoginResult`（native 桥实现不动）；asmdef 与 package.json 增 `com.gameframex.unity.login` 依赖。
+本包变更：`GoogleLoginManager` 改继承 `BaseLoginManager` 并实现 `ILoginManager`；新增 `GoogleLoginBootstrap`（`BeforeSceneLoad` 自注册 `"Google"`，宏墙 `#if UNITY_ANDROID || UNITY_IOS` 限定支持平台，注册即平台默认渠道）；`GoogleLoginSuccess` → `GoogleLoginResult`（继承 `LoginResult`，`IdToken` 收敛到基类 `Token`）；删除 `GoogleLoginComponent` / `GoogleLoginComponentInspector` / `IGoogleLoginManager`；`GoogleLoginLinkBridge` 回调承载类型同步为 `GoogleLoginResult`（native 桥实现不动）；asmdef 与 package.json 增 `com.gameframex.unity.login` 依赖。
 
 # [2.0.0](https://github.com/gameframex/com.gameframex.unity.login.google/compare/1.1.2...2.0.0) (2026-10-08)
 
