@@ -1,3 +1,18 @@
+# [2.0.0](https://github.com/gameframex/com.gameframex.unity.login.google/compare/1.1.2...2.0.0) (2026-10-15)
+
+
+### Features
+
+* **login:** Bootstrap 宏墙限定 Android 与 iOS 注册平台 ([51b5a07](https://github.com/gameframex/com.gameframex.unity.login.google/commit/51b5a07b57684274c03d6710887e7bfcd24fe8ae))
+* **login:** 渠道化改造为 login 核心包的 Google 渠道包 ([5079138](https://github.com/gameframex/com.gameframex.unity.login.google/commit/50791389ca00684d0efe1e219192da3f8c9a67f9))
+
+
+### BREAKING CHANGES
+
+* **login:** 删除 GoogleLoginComponent / IGoogleLoginManager /
+GoogleLoginSuccess，登录访问面收敛为 entry 的单一 GameApp.Login，
+迁移对照见 CHANGELOG 3.0.0 条目。
+
 # [3.0.0](https://github.com/gameframex/com.gameframex.unity.login.google/compare/2.0.0...3.0.0) (2026-10-15)
 
 
