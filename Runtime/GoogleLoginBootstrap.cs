@@ -1,3 +1,5 @@
+#if UNITY_ANDROID || UNITY_IOS
+
 // ==========================================================================================
 //  GameFrameX 组织及其衍生项目的版权、商标、专利及其他相关权利
 //  GameFrameX organization and its derivative projects' copyrights, trademarks, patents and related rights
@@ -38,7 +40,8 @@ namespace GameFrameX.Login.Google.Runtime
     /// </summary>
     /// <remarks>
     /// 在 BeforeSceneLoad 阶段（早于 LoginComponent.Awake）将渠道注册进 LoginChannelRegistry；
-    /// 未安装本包时代码被裁剪，注册不会发生（引用即注册）。
+    /// 未安装本包或当前平台不在宏墙内（Android / iOS，含 Editor 对应构建目标）时代码不参与编译，注册不会发生
+    /// （引用即注册 + 宏墙保证渠道平台互斥，注册即平台默认）。
     /// </remarks>
     [UnityEngine.Scripting.Preserve]
     internal static class GoogleLoginBootstrap
@@ -51,3 +54,5 @@ namespace GameFrameX.Login.Google.Runtime
         }
     }
 }
+
+#endif

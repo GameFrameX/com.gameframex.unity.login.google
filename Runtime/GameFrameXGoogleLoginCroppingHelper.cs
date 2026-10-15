@@ -40,7 +40,9 @@ namespace GameFrameX.Login.Google.Runtime
         void Start()
         {
             _ = typeof(GameFrameX.Login.Google.Runtime.GoogleLoginManager);
+#if UNITY_ANDROID || UNITY_IOS
             _ = typeof(GameFrameX.Login.Google.Runtime.GoogleLoginBootstrap);
+#endif
             _ = typeof(GameFrameX.Login.Google.Runtime.GoogleLoginLinkBridge);
             _ = typeof(GameFrameX.Login.Google.Runtime.GoogleLoginResult);
         }
