@@ -48,7 +48,7 @@ namespace GameFrameX.Login.Google.Runtime
                 if (_instance == null)
                 {
                     _instance = new GameObject("GoogleLoginLinkBridge").AddComponent<GoogleLoginLinkBridge>();
-                    DontDestroyOnLoad(_instance);
+                    UnityEngine.Object.DontDestroyOnLoad(_instance);
                 }
 
                 return _instance;
