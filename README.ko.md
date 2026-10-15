@@ -30,7 +30,7 @@
 - `GoogleLoginManager`로 `ILoginManager` Google 채널 구현. `GoogleLoginBootstrap`이 `BeforeSceneLoad`에서 `LoginChannelRegistry`에 자동 등록(채널 ID `"Google"`). 패키지 설치만으로 활성화되며 씬과 entry 패키지 변경 불필요
 - `GoogleLoginResult : LoginResult`는 `FamilyName` / `GivenName` / `PlayerId` 유지. IdToken은 통합 `Token` 필드로 전달되고 `PlayerId`는 `OpenId`에도 기록됩니다
 - 채널 설정은 채널 패키지가 직접 읽습니다: BlankGetChannel을 통해 `googleProjectId` 읽기(Web 클라이언트 ID여야 함)
-- Google은 `LoginComponent`의 Android / iOS 플랫폼 기본 관리자. Editor에서는 스텁 데이터를 반환해 흐름 검증 가능
+- Google은 Bootstrap 매크로 월을 통해 Android / iOS에서 기본 채널로 등록됩니다(Android/iOS 빌드 타깃인 Editor 포함). Editor에서는 스텁 데이터를 반환해 흐름 검증 가능
 
 ## 빠른 시작
 
@@ -99,13 +99,13 @@ public class GoogleLoginDemo : MonoBehaviour
 
 ### 자동 등록 시맨틱
 
-`GoogleLoginBootstrap`는 `RuntimeInitializeOnLoadMethod(BeforeSceneLoad)`(`LoginComponent.Awake`보다 이른 시점)에서 `"Google"` 채널(팩토리 `() => new GoogleLoginManager()`)을 `LoginChannelRegistry`에 등록합니다. 이 패키지가 없으면 코드가 스트리핑되어 등록이 발생하지 않습니다. 설치 / 미설치 두 가지 프로젝트 형태 모두 컴파일 및 실행 가능합니다.
+`GoogleLoginBootstrap`는 `RuntimeInitializeOnLoadMethod(BeforeSceneLoad)`(`LoginComponent.Awake`보다 이른 시점)에서 `"Google"` 채널(팩토리 `() => new GoogleLoginManager()`)을 `LoginChannelRegistry`에 등록하며, 매크로 월에 의해 Android / iOS에서만 발생합니다. 이 패키지가 없거나 플랫폼이 매크로 월 밖이면 코드가 컴파일되지 않거나 스트리핑되어 등록이 발생하지 않습니다. 설치 / 미설치 두 가지 프로젝트 형태 모두 컴파일 및 실행 가능합니다.
 
 ### 핵심 패키지와의 관계
 
 - `com.gameframex.unity.login`만 의존(`com.gameframex.unity` 및 BlankGetChannel 포함).
-- Google은 `LoginComponent`의 Android / iOS 플랫폼 기본 관리자 타입(직렬화된 타입 이름 문자열. 구현이 없으면 `DefaultLoginManager`로 폴백).
-- `LoginParams.ChannelId = "Google"` 명시적 라우팅. 비어 있으면 플랫폼 기본으로(동일 인스턴스, 이중화 없음).
+- Google은 Bootstrap 매크로 월을 통해 Android / iOS(빌드 타깃이 일치하는 Editor 포함)에서 기본 채널로 자동 등록됩니다. 다른 플랫폼에서는 bootstrap이 컴파일되지 않고 등록도 발생하지 않으며, 핵심 패키지의 DefaultLoginManager 포워더가 경고를 내고 아무 동작도 하지 않습니다.
+- `LoginParams.ChannelId = "Google"` 명시적 라우팅. 비어 있으면 레지스트리 상호 배제로 해결됩니다(처음 등록된 채널. 모듈 슬롯은 핵심 패키지의 `DefaultLoginManager` 포워더가 차지).
 
 ### 마이그레이션 안내(2.x -> 3.0.0)
 

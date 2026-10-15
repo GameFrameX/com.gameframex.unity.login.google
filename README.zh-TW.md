@@ -30,7 +30,7 @@
 - 以 `GoogleLoginManager` 實現 `ILoginManager` Google 渠道；經 `GoogleLoginBootstrap` 在 `BeforeSceneLoad` 自註冊進 `LoginChannelRegistry`（渠道標識 `"Google"`）——裝包即生效，場景與 entry 包零改動
 - `GoogleLoginResult : LoginResult` 保留 `FamilyName` / `GivenName` / `PlayerId`；IdToken 由統一 `Token` 欄位承載，`PlayerId` 同時寫入 `OpenId`
 - 渠道配置由渠道包自讀：經 BlankGetChannel 讀取 `googleProjectId`（必須是 Web 端 ClientId）
-- Google 是 `LoginComponent` 的 Android / iOS 平台預設管理器；Editor 下返回樁資料供流程驗證
+- Google 經 Bootstrap 宏牆在 Android / iOS 上註冊為預設渠道（含建置目標為 Android/iOS 的 Editor）；Editor 下返回樁資料供流程驗證
 
 ## 快速開始
 
@@ -99,13 +99,13 @@ public class GoogleLoginDemo : MonoBehaviour
 
 ### 自註冊語義
 
-`GoogleLoginBootstrap` 在 `RuntimeInitializeOnLoadMethod(BeforeSceneLoad)`（早於 `LoginComponent.Awake`）將 `"Google"` 渠道（工廠 `() => new GoogleLoginManager()`）註冊進 `LoginChannelRegistry`。未安裝本包時代碼被裁剪、註冊不會發生；裝包 / 不裝包兩種工程形態均可編譯執行。
+`GoogleLoginBootstrap` 在 `RuntimeInitializeOnLoadMethod(BeforeSceneLoad)`（早於 `LoginComponent.Awake`）將 `"Google"` 渠道（工廠 `() => new GoogleLoginManager()`）註冊進 `LoginChannelRegistry`，僅在 Android / iOS 上生效（由宏牆強制）。未安裝本包或平台不在宏牆內時代碼被裁剪、註冊不會發生；裝包 / 不裝包兩種工程形態均可編譯執行。
 
 ### 與核心包的關係
 
 - 只依賴 `com.gameframex.unity.login`（外加 `com.gameframex.unity` 與 BlankGetChannel）。
-- Google 是 `LoginComponent` 上 Android / iOS 平台預設管理器類型（序列化類型名字串；實現缺失時回落 `DefaultLoginManager`）。
-- `LoginParams.ChannelId = "Google"` 顯式路由；為空回落平台預設（同一實例，無雙實例）。
+- Google 經 Bootstrap 宏牆在 Android / iOS（含建置目標匹配的 Editor）自註冊為預設渠道；其他平台上 bootstrap 不編譯、不發生註冊，核心包 DefaultLoginManager 轉發器告警並空操作。
+- `LoginParams.ChannelId = "Google"` 顯式路由；為空經註冊表互斥解析（首個註冊的渠道；模組槽位由核心包 `DefaultLoginManager` 轉發器佔據）。
 
 ### 遷移說明（2.x -> 3.0.0）
 

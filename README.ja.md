@@ -30,7 +30,7 @@
 - `GoogleLoginManager` として `ILoginManager` の Google チャネルを実装。`GoogleLoginBootstrap` が `BeforeSceneLoad` で `LoginChannelRegistry` へ自己登録（チャネル ID `"Google"`）。パッケージ導入だけで有効で、シーンと entry パッケージの変更は不要
 - `GoogleLoginResult : LoginResult` は `FamilyName` / `GivenName` / `PlayerId` を保持。IdToken は統一 `Token` フィールドで運ばれ、`PlayerId` は `OpenId` にも書き込まれます
 - チャネル設定はチャネルパッケージが自分で読み取ります：BlankGetChannel 経由で `googleProjectId`（Web クライアント ID である必要あり）
-- Google は `LoginComponent` の Android / iOS プラットフォーム既定マネージャー。Editor ではスタブデータを返してフロー検証が可能
+- Google は Bootstrap のマクロウォール経由で Android / iOS における既定チャネルとして登録されます（ビルドターゲットが Android/iOS の Editor を含む）。Editor ではスタブデータを返してフロー検証が可能
 
 ## クイックスタート
 
@@ -99,13 +99,13 @@ public class GoogleLoginDemo : MonoBehaviour
 
 ### 自己登録セマンティクス
 
-`GoogleLoginBootstrap` は `RuntimeInitializeOnLoadMethod(BeforeSceneLoad)`（`LoginComponent.Awake` より早い段階）で `"Google"` チャネル（ファクトリ `() => new GoogleLoginManager()`）を `LoginChannelRegistry` に登録します。本パッケージが未導入の場合はコードがストリップされ、登録は発生しません。導入 / 未導入のどちらのプロジェクト形態でもコンパイル・実行できます。
+`GoogleLoginBootstrap` は `RuntimeInitializeOnLoadMethod(BeforeSceneLoad)`（`LoginComponent.Awake` より早い段階）で `"Google"` チャネル（ファクトリ `() => new GoogleLoginManager()`）を `LoginChannelRegistry` に登録します。登録はマクロウォールにより Android / iOS のみで発生します。本パッケージが未導入（またはプラットフォームがマクロウォール外）の場合はコードがコンパイルされず / ストリップされ、登録は発生しません。導入 / 未導入のどちらのプロジェクト形態でもコンパイル・実行できます。
 
 ### 中核パッケージとの関係
 
 - `com.gameframex.unity.login` のみに依存（`com.gameframex.unity` と BlankGetChannel を含む）。
-- Google は `LoginComponent` の Android / iOS プラットフォーム既定マネージャー型（シリアライズされた型名文字列。実装が無い場合は `DefaultLoginManager` へフォールバック）。
-- `LoginParams.ChannelId = "Google"` で明示的ルーティング。空ならプラットフォーム既定へ（同一インスタンス、二重化なし）。
+- Google は Bootstrap のマクロウォール経由で Android / iOS（ビルドターゲットが一致する Editor を含む）で既定チャネルとして自己登録します。他のプラットフォームでは bootstrap がコンパイルされず、登録も発生せず、中核パッケージの DefaultLoginManager フォワーダが警告を出して何も行いません。
+- `LoginParams.ChannelId = "Google"` で明示的ルーティング。空の場合はレジストリの相互排他で解決されます（最初に登録されたチャネル。モジュールスロットは中核パッケージの `DefaultLoginManager` フォワーダが占有）。
 
 ### 移行ガイド（2.x -> 3.0.0）
 

@@ -30,7 +30,7 @@ All-in-One Solution for Indie Game Development · Empowering Indie Developers' D
 - Implements the `ILoginManager` Google channel; registers itself into `LoginChannelRegistry` at `BeforeSceneLoad` via `GoogleLoginBootstrap` (channel id `"Google"`) - installing the package is all it takes, no scene or entry package change required
 - `GoogleLoginResult : LoginResult` keeps `FamilyName` / `GivenName` / `PlayerId`; the IdToken is carried by the unified `Token` field and `PlayerId` is also written into `OpenId`
 - Channel config is read by the channel package itself: `googleProjectId` via BlankGetChannel (must be the Web client id)
-- Google is the Android / iOS platform default manager on `LoginComponent`; Editor runs a stub sign-in for flow verification
+- Google registers as the default channel on Android / iOS via the Bootstrap macro wall (including the Editor with an Android/iOS build target); Editor runs a stub sign-in for flow verification
 
 ## Quick Start
 
@@ -99,13 +99,13 @@ public class GoogleLoginDemo : MonoBehaviour
 
 ### Self-Registration Semantics
 
-`GoogleLoginBootstrap` registers the `"Google"` channel (factory `() => new GoogleLoginManager()`) into `LoginChannelRegistry` at `RuntimeInitializeOnLoadMethod(BeforeSceneLoad)` - earlier than `LoginComponent.Awake`. When this package is absent the code is stripped and the registration simply does not happen; projects with / without this package both compile and run.
+`GoogleLoginBootstrap` registers the `"Google"` channel (factory `() => new GoogleLoginManager()`) into `LoginChannelRegistry` at `RuntimeInitializeOnLoadMethod(BeforeSceneLoad)` - earlier than `LoginComponent.Awake`, on Android / iOS only, enforced by the macro wall. When this package is absent (or the platform is outside the macro wall) the code does not compile / is stripped and the registration simply does not happen; projects with / without this package both compile and run.
 
 ### Relationship with the core package
 
 - Depends only on `com.gameframex.unity.login` (plus `com.gameframex.unity` and BlankGetChannel).
-- Google is the Android / iOS platform default manager type on `LoginComponent` (serialized type-name string; a missing implementation falls back to `DefaultLoginManager`).
-- `LoginParams.ChannelId = "Google"` routes explicitly; empty falls back to the platform default (same instance, no duplication).
+- Google self-registers as the default channel on Android / iOS (incl. Editor with matching build target) via the Bootstrap macro wall; on other platforms the bootstrap does not compile, no registration happens, and the core-package DefaultLoginManager forwarder warns and no-ops.
+- `LoginParams.ChannelId = "Google"` routes explicitly; empty resolves via registry mutual exclusion (first registered channel; the module slot is occupied by the core-package `DefaultLoginManager` forwarder).
 
 ### Migration (2.x -> 3.0.0)
 
