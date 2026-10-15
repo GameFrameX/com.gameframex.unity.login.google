@@ -1,8 +1,8 @@
 {
     "name": "com.gameframex.unity.login.google",
-    "displayName": "Game Frame X Google Login",
+    "displayName": "Game Frame X Login Google",
     "category": "Game Framework X",
-    "description": "独立游戏前后端一体化解决方案,独立游戏开发者的圆梦大使。\n文档地址: https://gameframex.doc.alianblank.com \n Game Frame X Google Login 谷歌登录渠道包。",
+    "description": "Google login channel package for the GameFrameX Login registry. Implements ILoginManager as GoogleLoginManager and self-registers into LoginChannelRegistry at BeforeSceneLoad via GoogleLoginBootstrap (channel id Google), macro-walled to Android / iOS (incl. the Editor with a matching build target) so registration itself defines the default channel; installing the package is all it takes. Returns GoogleLoginResult, a LoginResult subclass carrying the IdToken in the unified Token field plus FamilyName / GivenName / PlayerId (also written to OpenId); reads googleProjectId via BlankGetChannel, with a stub sign-in in the Editor. Docs: https://gameframex.doc.alianblank.com\n\nGameFrameX Login 的 Google 登录渠道功能包。以 GoogleLoginManager 实现 ILoginManager，经 GoogleLoginBootstrap 在 BeforeSceneLoad 自注册进 LoginChannelRegistry（渠道标识 Google），Bootstrap 宏墙限定 Android / iOS（含 Editor 对应构建目标），注册即平台默认渠道，装包即生效。返回 LoginResult 子类 GoogleLoginResult，IdToken 由统一 Token 字段承载，并保留 FamilyName / GivenName / PlayerId（同时写入 OpenId）；经 BlankGetChannel 读取 googleProjectId，Editor 下返回桩数据供流程验证。文档：https://gameframex.doc.alianblank.com",
     "version": "3.0.0",
     "unity": "2019.4",
     "keywords": [
@@ -21,7 +21,7 @@
         "url": "https://gameframex.doc.alianblank.com"
     },
     "dependencies": {
-        "com.gameframex.unity": "2.5.4",
+        "com.gameframex.unity": "3.0.0",
         "com.gameframex.unity.getchannel": "1.3.2",
         "com.gameframex.unity.login": "1.0.0"
     },
