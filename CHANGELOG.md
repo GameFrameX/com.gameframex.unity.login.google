@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/gameframex/com.gameframex.unity.login.google/compare/2.0.1...2.0.2) (2026-11-10)
+
+
+### Bug Fixes
+
+* **login.google:** 添加完整 link.xml 防代码裁剪保护 ([c9b135c](https://github.com/gameframex/com.gameframex.unity.login.google/commit/c9b135c149f15efb9b10090b001dc590928175c1))
+
 ## [2.0.1](https://github.com/gameframex/com.gameframex.unity.login.google/compare/2.0.0...2.0.1) (2026-10-15)
 
 
